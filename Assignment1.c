@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-#include<stdlib.h>
+#include <stdlib.h>
 #include <time.h>
 
 int main(){
@@ -70,9 +70,16 @@ int main(){
 	cuserid(buf);
 	//Print username, parent process id, group id, euid and uid
 	printf("\nProcess id %d is being run by user %s\n", getpid(), buf);
+	//If this is the parent process
 	if( pid > 0 ){
 	    printf("Process id %d is the parent process\n", getpid() );
-	}else{
+	    //Get and print the cwd
+	    char cwd[1024];
+	    getcwd(cwd, sizeof(cwd) );
+	    printf("Current directory is %s\n", cwd);
+	}
+	//If this is either child, print the parent process id
+	else{
 	    printf("Process id %d has parent process id %d\n", getpid(), getppid() ); 
 	}
 	printf("Process id %d has group id %d\n", getpid(),  getpgrp() );
@@ -88,5 +95,5 @@ int main(){
 	
 	//Wait again, so there are no print statments in my command line
 	wait();
-	return(0);
+	exit(0);
 }
