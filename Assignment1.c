@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/resource.h>
+#include <sys/wait.h>
 
 //True and false values since there are no boolean typs
 #define TRUE 1
@@ -26,7 +27,7 @@ int main(){
 	time(&begin);
 	time_t end;
 	
-	pid_t pid, curpid;
+	pid_t pid;
 	int f1;
 	int f2;
 	f1 = 1;
@@ -37,7 +38,7 @@ int main(){
 	
 	//Check if there was a fork error
 	if( pid<0 ){
-		printf("error in fork!");
+		perror("Error in forking first child:");
     }
     //If this is the first child
 	else if(pid == 0){
@@ -72,7 +73,7 @@ int main(){
 	    pid = fork();
 	    //Check for errors
 	    if( pid<0 ){
-		    printf("error in fork!");
+		    perror("Error in forking second child:");
         }
         //If this is the second child
 	    else if(pid == 0){
@@ -110,11 +111,13 @@ int main(){
 	            printf("\nProcess id %d (parent) says the first child terminated with status %d\n", getpid(), status);
 	        }else{
 	            printf("\nProcess id %d (parent) says the first child had a termination error\n", getpid());
+	            perror("Child 1 termination error:");
 	        }
 	        if( wait(&status) ){
 	            printf("\nProcess id %d (parent) says the second child terminated with status %d\n", getpid(), status);
 	        }else{
 	            printf("\nProcess id %d (parent) says the second child had a termination error\n", getpid());
+	            perror("Child 2 termination error:");
 	        }
 	        int i;
 	        for(i = 0; i < 100*LOOPCOUNT; i++ )
@@ -124,6 +127,7 @@ int main(){
             time_printout("parent", begin, end);
 	    }
 	}
+	wait(NULL);
 	exit(0);
 }
 
