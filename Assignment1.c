@@ -9,7 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 
-//Number of fibonacci number each child prints out
+//Number of fibonacci numbers each child prints out
 #define ITERATIONS 10
 
 //Number of iterations of loop to cause non-zero time values
@@ -20,6 +20,7 @@
 
 int info_printout(char *process_title, int isParent);
 int time_printout(char *process_title, double begin, double end);
+int cuserid(char *p);
 
 int main(){
     /*** Variables for calculating runtime later ***/
@@ -57,6 +58,7 @@ int main(){
 	        f2 = f1 + f2;
 	        f1 = f1 + f2;
             printf("The process id %d (first child) produced the Fibonnaci number f%d as %d\n", getpid(), i+2, f2);  
+            fflush(stdout);
             
             sleep(2);
 	    }
@@ -82,6 +84,7 @@ int main(){
             /*** Child 2 Printouts ***/
 	        info_printout("second child", FALSE);
 	        printf("Ending Info Printouts\n\n");
+	        fflush(stdout);
 	        
 	        int i;
 	        //Sleep before loop so that the info messages print before the
@@ -92,6 +95,7 @@ int main(){
 	            f2 = f1 + f2;
 	            f1 = f1 + f2;
                 printf("The process id %d (second child) produced the Fibonnaci number f%d as %d\n", getpid(), i+2, f2);
+                fflush(stdout);
                 
                 sleep(2);
             }
@@ -106,6 +110,7 @@ int main(){
 	        printf("Beginning Info Printouts\n");
 	        info_printout("parent", TRUE);
 	        
+	        //Print status of children when they finish
 	        int status;
 	        if( wait(&status) ){
 	            printf("\nProcess id %d (parent) says the first child terminated with status %d\n", getpid(), status);
@@ -113,12 +118,14 @@ int main(){
 	            printf("\nProcess id %d (parent) says the first child had a termination error\n", getpid());
 	            perror("Child 1 termination error:");
 	        }
+	        fflush(stdout);
 	        if( wait(&status) ){
 	            printf("\nProcess id %d (parent) says the second child terminated with status %d\n", getpid(), status);
 	        }else{
 	            printf("\nProcess id %d (parent) says the second child had a termination error\n", getpid());
 	            perror("Child 2 termination error:");
 	        }
+	        fflush(stdout);
 	        int i;
 	        for(i = 0; i < 100*LOOPCOUNT; i++ )
 	            ;  //Loop for nonzero time values
@@ -127,6 +134,7 @@ int main(){
             time_printout("parent", begin, end);
 	    }
 	}
+	//I call wait again to make sure the parent is the last to terminate
 	wait(NULL);
 	exit(0);
 }
@@ -134,12 +142,13 @@ int main(){
 int info_printout(char *process_title, int isParent){
     /*** 1) Get username, parent and child processes' real and effective ***
 	 ***    user ids, and their group ids                                ***/
-	//Allocate a string of size 10
-	char buf[10];
+	//Allocate a string of size 20
+	char *buf = (char *) malloc(20*sizeof(char));
 	//Save username to string
 	cuserid(buf);
 	//Print username, parent process id, r and e group id, euid and uid
 	printf("Process id %d (%s) is being run by user %s\n", getpid(), process_title, buf);
+	free(buf);
 	//If this is the parent process
 	if( isParent ){
 	    printf("Process id %d (%s) is the parent process\n", getpid(), process_title );
@@ -156,6 +165,7 @@ int info_printout(char *process_title, int isParent){
 	printf("Process id %d (%s) has effective group id %d\n", getpid(), process_title, getegid() );
 	printf("Process id %d (%s) has real user id %d\n", getpid(), process_title, getuid() );
 	printf("Process id %d (%s) has effective user id %d\n\n", getpid(), process_title, geteuid() );
+	fflush(stdout);
 	return(0);
 }
 
@@ -169,6 +179,7 @@ int time_printout(char *process_title, double begin, double end){
             getpid(), process_title, (RUsage.ru_utime).tv_sec + (float) (RUsage.ru_utime).tv_usec / 1000000000);
     printf("Process id %d (%s) has system time %fs\n", 
             getpid(), process_title, (RUsage.ru_stime).tv_sec + (float) (RUsage.ru_utime).tv_usec / 1000000000);
-
+    
+    fflush(stdout);
     return(0);
 }
