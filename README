@@ -1,0 +1,10 @@
+To compile, use the command make.
+
+To test, use the command make test.
+
+You can also remove the compile cole with the command make clean.
+
+script_output.txt contains the output from running the script command.
+This includes compiling and running the file.
+
+output.txt contains the output just from running the executable file.
