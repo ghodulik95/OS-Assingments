@@ -139,6 +139,9 @@ int main(){
 	exit(0);
 }
 
+//Prints out process information, real and effective gid and uid
+//Calls the current process process_title, and there is slightly different
+//behavior when it is the parent
 int info_printout(char *process_title, int isParent){
     /*** 1) Get username, parent and child processes' real and effective ***
 	 ***    user ids, and their group ids                                ***/
@@ -161,6 +164,7 @@ int info_printout(char *process_title, int isParent){
 	else{
 	    printf("Process id %d (%s) has parent process id %d\n", getpid(), process_title, getppid() ); 
 	}
+	//Print real and effective group id and user ids
 	printf("Process id %d (%s) has real group id %d\n", getpid(), process_title, getgid() );
 	printf("Process id %d (%s) has effective group id %d\n", getpid(), process_title, getegid() );
 	printf("Process id %d (%s) has real user id %d\n", getpid(), process_title, getuid() );
@@ -170,13 +174,18 @@ int info_printout(char *process_title, int isParent){
 }
 
 
+//Prints out runtime information, given the begin and endtime
+//Refers to the current proccess as process_title
 int time_printout(char *process_title, double begin, double end){
     struct rusage RUsage;
     getrusage(RUSAGE_SELF, &RUsage);
     
+    //Print wall clock time
     printf("\nProcess id %d (%s) has wall clock time %fs\n", getpid(), process_title, end - begin);
+    //Print user time
     printf("Process id %d (%s) has user time %fs\n", 
             getpid(), process_title, (RUsage.ru_utime).tv_sec + (float) (RUsage.ru_utime).tv_usec / 1000000000);
+    //Print system time
     printf("Process id %d (%s) has system time %fs\n", 
             getpid(), process_title, (RUsage.ru_stime).tv_sec + (float) (RUsage.ru_utime).tv_usec / 1000000000);
     
